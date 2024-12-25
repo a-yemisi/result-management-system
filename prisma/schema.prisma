@@ -1,0 +1,238 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Users {
+  user_id        String          @id @default(uuid())
+  username       String          @unique
+  password_hash  String
+  first_name     String
+  last_name      String
+  created_at     DateTime        @default(now())
+  is_student     Boolean
+  StudentDetails StudentDetails?
+  StaffDetails   StaffDetails?
+  AuditLogs      AuditLogs[]
+}
+
+model StudentDetails {
+  student_id            String                  @id @unique
+  class_id              Int?
+  subclass_id           Int?
+  parent_email          String?
+  is_active             Boolean                 @default(true)
+  Users                 Users                   @relation(fields: [student_id], references: [user_id])
+  Class                 Classes?                @relation(fields: [class_id], references: [class_id])
+  SubClass              SubClasses?             @relation(fields: [subclass_id], references: [subclass_id])
+  StudentSubjects       StudentSubjects[]
+  StudentAverageResults StudentAverageResults[]
+  StudentDomainResults  StudentDomainResults[]
+}
+
+model StaffDetails {
+  staff_id              String                  @id @unique
+  hire_date             DateTime?
+  is_active             Boolean                 @default(true)
+  Users                 Users                   @relation(fields: [staff_id], references: [user_id])
+  StaffUserRoles        StaffUserRoles[]
+  SubClasses            SubClasses[]
+  Classes               Classes[]
+  StudentAverageResults StudentAverageResults[]
+}
+
+model Classes {
+  class_id              Int                     @id @default(autoincrement())
+  class_name            String
+  class_teacher         String?
+  teacher               StaffDetails?           @relation(fields: [class_teacher], references: [staff_id])
+  SubClasses            SubClasses[]
+  Subjects              Subjects[]
+  StudentDetails        StudentDetails[]
+  StudentAverageResults StudentAverageResults[]
+}
+
+model SubClasses {
+  subclass_id           Int                     @id @default(autoincrement())
+  subclass_name         String
+  class_id              Int?
+  class                 Classes?                @relation(fields: [class_id], references: [class_id])
+  subclass_teacher      String?
+  teacher               StaffDetails?           @relation(fields: [subclass_teacher], references: [staff_id])
+  Subjects              Subjects[]
+  StudentDetails        StudentDetails[]
+  StudentAverageResults StudentAverageResults[]
+}
+
+model StaffRoles {
+  role_id         Int               @id @default(autoincrement())
+  role_name       String            @unique
+  StaffUserRoles  StaffUserRoles[]
+  RolePermissions RolePermissions[]
+}
+
+model Permissions {
+  permission_id   Int               @id @default(autoincrement())
+  permission_name String            @unique
+  RolePermissions RolePermissions[]
+}
+
+model RolePermissions {
+  role_id       Int
+  permission_id Int
+
+  StaffRoles  StaffRoles  @relation(fields: [role_id], references: [role_id])
+  Permissions Permissions @relation(fields: [permission_id], references: [permission_id])
+
+  @@id([role_id, permission_id])
+}
+
+model StaffUserRoles {
+  staff_id     String
+  role_id      Int
+  StaffDetails StaffDetails @relation(fields: [staff_id], references: [staff_id])
+  StaffRoles   StaffRoles   @relation(fields: [role_id], references: [role_id])
+
+  @@id([staff_id, role_id])
+}
+
+model AcademicYears {
+  session_id            Int                     @id @default(autoincrement())
+  session_name          String
+  start_date            DateTime
+  end_date              DateTime
+  Terms                 Terms[]
+  StudentSubjects       StudentSubjects[]
+  StudentAverageResults StudentAverageResults[]
+  StudentDomainResults  StudentDomainResults[]
+}
+
+model Terms {
+  term_id               Int                     @id @default(autoincrement())
+  term_name             String
+  session_id            Int
+  start_date            DateTime
+  end_date              DateTime
+  result_released       Boolean                 @default(false)
+  AcademicYears         AcademicYears           @relation(fields: [session_id], references: [session_id])
+  StudentSubjects       StudentSubjects[]
+  StudentAverageResults StudentAverageResults[]
+  StudentDomainResults  StudentDomainResults[]
+}
+
+model Settings {
+  setting_name  Int    @id @default(autoincrement())
+  setting_value String
+}
+
+model SubjectTypes {
+  type_id   Int        @id @default(autoincrement())
+  type_name String     @unique
+  Subjects  Subjects[]
+}
+
+model Subjects {
+  subject_id      Int               @id @default(autoincrement())
+  subject_name    String
+  class_id        Int?
+  subclass_id     Int?
+  subject_type    Int?
+  Classes         Classes?          @relation(fields: [class_id], references: [class_id])
+  SubClasses      SubClasses?       @relation(fields: [subclass_id], references: [subclass_id])
+  SubjectTypes    SubjectTypes?     @relation(fields: [subject_type], references: [type_id])
+  StudentSubjects StudentSubjects[]
+}
+
+model StudentSubjects {
+  student_id     String
+  subject_id     Int
+  ca_score       Int            @default(0)
+  exam_score     Int            @default(0)
+  total_score    Int            @default(0)
+  academic_year  Int
+  term           Int
+  StudentDetails StudentDetails @relation(fields: [student_id], references: [student_id])
+  Subjects       Subjects       @relation(fields: [subject_id], references: [subject_id])
+  AcademicYears  AcademicYears  @relation(fields: [academic_year], references: [session_id])
+  Terms          Terms          @relation(fields: [term], references: [term_id])
+
+  @@id([student_id, subject_id, academic_year, term])
+}
+
+model StudentAverageResults {
+  student_id            String
+  student_average_score Float
+  student_class         Int?
+  student_subclass      Int?
+  academic_year         Int
+  term                  Int
+  is_promoted           Boolean
+  teacher_comment       String?
+  class_teacher         String?
+  StudentDetails        StudentDetails @relation(fields: [student_id], references: [student_id])
+  Classes               Classes?       @relation(fields: [student_class], references: [class_id])
+  SubClasses            SubClasses?    @relation(fields: [student_subclass], references: [subclass_id])
+  AcademicYears         AcademicYears  @relation(fields: [academic_year], references: [session_id], onDelete: Cascade)
+  Terms                 Terms          @relation(fields: [term], references: [term_id], onDelete: Cascade)
+  StaffDetails          StaffDetails?  @relation(fields: [class_teacher], references: [staff_id], onDelete: SetNull)
+
+  @@id([student_id, academic_year, term])
+}
+
+model DomainAttributes {
+  attribute_id         Int                    @id @default(autoincrement())
+  attribute_name       String                 @unique
+  domain_type          DomainType
+  min_score            Int                    @default(0)
+  max_score            Int
+  StudentDomainResults StudentDomainResults[]
+}
+
+enum DomainType {
+  Affective
+  Psychomotor
+}
+
+model StudentDomainResults {
+  student_id       String
+  attribute_id     Int
+  academic_year    Int
+  term             Int
+  score            Int
+  StudentDetails   StudentDetails   @relation(fields: [student_id], references: [student_id], onDelete: Cascade)
+  DomainAttributes DomainAttributes @relation(fields: [attribute_id], references: [attribute_id], onDelete: Cascade)
+  AcademicYears    AcademicYears    @relation(fields: [academic_year], references: [session_id])
+  Terms            Terms            @relation(fields: [term], references: [term_id])
+
+  @@id([student_id, attribute_id, academic_year, term])
+}
+
+model Grades {
+  grade_id    Int    @id @default(autoincrement())
+  min_score   Int
+  max_score   Int
+  grade_value String
+}
+
+model KeyRatings {
+  value          Int    @id @default(autoincrement())
+  rating_meaning String
+}
+
+model AuditLogs {
+  log_id     Int      @id @default(autoincrement())
+  user_id    String
+  action     String
+  created_at DateTime @default(now())
+  Users      Users    @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
+}
