@@ -1,3 +1,5 @@
+"use client";
+
 import {
   MdOutlinePerson2,
   MdOutlineArrowDropDown,
@@ -5,6 +7,7 @@ import {
   MdOutlineClose as CloseIcon,
 } from "react-icons/md";
 import Image from "next/image";
+import { useSession } from "next-auth/react";
 
 interface HeaderProps {
   isNavOpen: boolean;
@@ -12,6 +15,24 @@ interface HeaderProps {
 }
 
 export default function Header({ isNavOpen, toggleNav }: HeaderProps) {
+  const { data: session, status } = useSession();
+
+  // Check if session is loaded and if user data exists
+  if (status === "loading") {
+    return <p>Loading...</p>;
+  }
+
+  if (!session || !session.user) {
+    return <p>User not logged in.</p>;
+  }
+
+  // Now safely access session.user.firstName
+  const userName = session.user.firstName;
+  const studentClass = session.user.studentClass;
+  const staffRole = session.user.staffRole;
+  const userType = session.user.isStudent
+    ? `STUDENT | ${studentClass.toUpperCase()}`
+    : staffRole.toUpperCase();
   return (
     <div className="p-[15px] lg:px-[25px] flex gap-[15px] lg:gap-[25px] items-center text-[#2E3830] bg-white fixed w-full h-[60px] shadow-lg ">
       <button onClick={toggleNav} className="text-[#2E3830] focus:outline-none">
@@ -45,8 +66,10 @@ export default function Header({ isNavOpen, toggleNav }: HeaderProps) {
             <MdOutlineArrowDropDown size={15} />
           </div>
           <div>
-            <p className="text-[10px] md:text-[12px] font-medium">OLAOLUWA</p>
-            <p className="text-[8px] md:text-[10px]">STUDENT | SS3</p>
+            <p className="text-[10px] md:text-[12px] font-medium">
+              {userName.toUpperCase()}
+            </p>
+            <p className="text-[8px] md:text-[10px]">{userType}</p>
           </div>
         </div>
       </div>

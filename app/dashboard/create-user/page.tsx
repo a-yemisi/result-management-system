@@ -9,13 +9,19 @@ export default function UserManagementPage() {
   const [message, setMessage] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
+  const [userType, setUserType] = useState("student");
+  const [studentDetails, setStudentDetails] = useState({
+    classId: 0,
+    subClassId: 0,
+    parentEmail: "",
+  });
 
   const handleCreateUser = async (e: React.FormEvent) => {
     e.preventDefault();
     setMessage("");
 
     try {
-      const response = await fetch("/api/users", {
+      const response = await fetch("/api/create-user", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

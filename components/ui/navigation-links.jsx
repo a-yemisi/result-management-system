@@ -21,7 +21,7 @@ function NavLink({ href, icon: Icon, label }) {
   const isActive = pathname === href;
 
   const baseClass =
-    "flex gap-2 items-center w-full py-2 md:py-2.5 pl-2 md:pl-4 lg:pl-6 text-[11px] md:text-[13px] font-medium rounded-[8px]";
+    "flex gap-2 items-center w-full py-2 md:py-2.5 pl-2 md:pl-3 lg:pl-4 text-[11px] md:text-[12.5px] font-medium rounded-[8px]";
   const hoverClass = "text-white bg-[#2E6B39]";
   const defaultClass = "text-[#5C7060]  hover:bg-[#D6F5DC]";
 
@@ -140,7 +140,7 @@ export function SignOutButton() {
   return (
     <button
       onClick={handleSignOut}
-      className="flex gap-2 items-center w-full py-2 md:py-2.5 pl-2 md:pl-4 lg:pl-6 text-[11px] md:text-[13px] font-medium rounded-[8px] text-[#5C7060] hover:bg-[#D6F5DC]"
+      className="flex gap-2 items-center w-full py-2 md:py-2.5 pl-2 md:pl-3 lg:pl-4 text-[11px] md:text-[12px] font-medium rounded-[8px] text-[#5C7060] hover:bg-[#D6F5DC]"
     >
       <MdExitToApp size={20} /> Sign Out
     </button>

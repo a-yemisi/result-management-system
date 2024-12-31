@@ -3,6 +3,7 @@ import { MdOutlinePerson, MdOutlineKey, MdChevronRight } from "react-icons/md";
 import Image from "next/image";
 import { signIn } from "next-auth/react";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function LoginForm({
   handleAlert,
@@ -11,17 +12,30 @@ export default function LoginForm({
 }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const result = await signIn("credentials", {
       username,
       password,
-      redirect: true, // Redirect after login
-      callbackUrl: "/dashboard/home", // Redirect to home
+      redirect: false, // Disable automatic redirect
+      callbackUrl: "/dashboard/home",
     });
-    console.log(result);
+
+    // Check if login failed and display error
+    if (result?.error) {
+      setErrorMessage("Incorrect username or password");
+    } else {
+      setErrorMessage("");
+    }
+
+    if (result?.ok) {
+      router.push(result.url || "/dashboard/hoome");
+    }
   };
+
   return (
     <form
       className="border-2 rounded-[8px] p-[20px] min-w-[270px] w-[40vw] max-w-[370px] bg-white text-[#2E3830]"
@@ -33,7 +47,7 @@ export default function LoginForm({
           width={60}
           height={60}
           alt="An img of the school logo"
-        ></Image>
+        />
         <h1 className="font-semibold text-[16px] text-[#061309]">
           DFC RESULT PORTAL
         </h1>
@@ -43,7 +57,7 @@ export default function LoginForm({
 
         <div>
           <label htmlFor="username">Username</label>
-          <div className="relative w-full  mt-[10px]">
+          <div className="relative w-full mt-[10px]">
             <MdOutlinePerson
               className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-500"
               size={20}
@@ -78,9 +92,14 @@ export default function LoginForm({
         </div>
       </div>
 
+      {/* Display the error message here if there's an incorrect login */}
+      {errorMessage && (
+        <p className="text-red-500 text-[12px] mt-2">{errorMessage}</p>
+      )}
+
       <div
         className="mt-[13px] text-[12px] font-medium hover:text-[#2E6B39] hover:cursor-pointer"
-        onClick={() => handleAlert("Contact your adminstrator")}
+        onClick={() => handleAlert("Contact your administrator")}
       >
         <p>Forgot password?</p>
       </div>
