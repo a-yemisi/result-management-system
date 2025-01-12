@@ -12,46 +12,24 @@ import {
   ApproveResultNavLink,
   UpdateStaffRolesNavLink,
   SignOutButton,
+  CreateNewUser,
 } from "@/components/ui/navigation-links";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
+import NotAllowed from "../not-allowed";
+import useStaffRoles from "@/hooks/use-staff-roles";
 
 export default function SideNav() {
   const { data: session, status } = useSession();
-  const [staffRolesNames, setStaffRolesNames] = useState<string[] | null>(null);
-  const [loadingRoles, setLoadingRoles] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchStaffRoles = async () => {
-      try {
-        if (session?.user?.id) {
-          const response = await fetch(
-            `/api/fetch-staff-roles?userId=${session.user.id}`
-          );
-          if (!response.ok) {
-            throw new Error("Failed to fetch staff roles");
-          }
-          const data = await response.json();
-          setStaffRolesNames(data.roleNames);
-        }
-      } catch (err) {
-        console.error("Error fetching staff roles:", err);
-        setError("Failed to load staff roles");
-      } finally {
-        setLoadingRoles(false);
-      }
-    };
-
-    fetchStaffRoles();
-  }, [session]);
+  const { staffRolesNames, loadingRoles, error } = useStaffRoles(session);
 
   if (status === "loading" || loadingRoles) {
     return <p>Loading...</p>;
   }
 
   if (!session || !session.user) {
-    return <p>User not logged in.</p>;
+    return <NotAllowed />;
   }
 
   if (error) {
@@ -86,15 +64,22 @@ export default function SideNav() {
             {(isClassTeacher || isVicePrincipal) && (
               <StudentSubjectApprovalNavLink />
             )}
-            {(isClassTeacher || isVicePrincipal || isPrincipal) && (
-              <DownloadStudentResultNavLink />
+            {(isClassTeacher ||
+              isVicePrincipal ||
+              isPrincipal ||
+              isAdministrator) && <DownloadStudentResultNavLink />}
+            {(isPrincipal || isOwner || isAdministrator) && (
+              <GradesRangeNavLink />
             )}
-            {(isPrincipal || isOwner) && <GradesRangeNavLink />}
             {(isVicePrincipal || isPrincipal || isOwner) && (
               <ApproveResultNavLink />
             )}
-            {(isVicePrincipal || isPrincipal || isOwner) && (
+            {(isVicePrincipal || isPrincipal || isOwner || isAdministrator) && (
               <UpdateStaffRolesNavLink />
+            )}
+
+            {(isAdministrator || isOwner || isPrincipal || isVicePrincipal) && (
+              <CreateNewUser />
             )}
           </div>
           <div className="mb-[60px]">

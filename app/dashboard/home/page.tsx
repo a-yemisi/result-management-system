@@ -1,12 +1,15 @@
-import { authOptions } from "@/lib/auth";
-import { getServerSession } from "next-auth";
+"use client";
 
-export default async function HomePage() {
-  const session = await getServerSession(authOptions);
+import { useSession } from "next-auth/react";
+import NotAllowed from "@/components/not-allowed";
+
+export default function HomePage() {
+  const { data: session, status } = useSession();
 
   if (!session) {
-    return <p>You must log in to access this page.</p>;
+    return <NotAllowed />;
   }
+
   return (
     <div>
       <h1>Home page</h1>

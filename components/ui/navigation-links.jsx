@@ -11,6 +11,7 @@ import {
   MdOutlineCloudDone,
   MdOutlineTipsAndUpdates,
   MdExitToApp,
+  MdOutlinePersonAddAlt,
 } from "react-icons/md";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -128,6 +129,16 @@ export function UpdateStaffRolesNavLink() {
       href="/dashboard/update-staff-roles"
       icon={MdOutlineTipsAndUpdates}
       label="Update Staff Roles"
+    />
+  );
+}
+
+export function CreateNewUser() {
+  return (
+    <NavLink
+      href="/dashboard/create-user"
+      icon={MdOutlinePersonAddAlt}
+      label="Create New User"
     />
   );
 }

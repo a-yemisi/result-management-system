@@ -8,6 +8,7 @@ import {
 } from "react-icons/md";
 import Image from "next/image";
 import { useSession } from "next-auth/react";
+import { useEffect, useState } from "react";
 
 interface HeaderProps {
   isNavOpen: boolean;
@@ -16,6 +17,16 @@ interface HeaderProps {
 
 export default function Header({ isNavOpen, toggleNav }: HeaderProps) {
   const { data: session, status } = useSession();
+  const [studentClass, setStudentClass] = useState("na");
+  const [staffRole, setStaffRole] = useState("na");
+  const [activeTermAndSession, setActiveTermAndSession] = useState("na");
+
+  useEffect(() => {
+    if (session && session.user) {
+      setStudentClass(session.user.studentClass);
+      setStaffRole(session.user.staffRole);
+    }
+  }, [session]);
 
   // Check if session is loaded and if user data exists
   if (status === "loading") {
@@ -28,8 +39,7 @@ export default function Header({ isNavOpen, toggleNav }: HeaderProps) {
 
   // Now safely access session.user.firstName
   const userName = session.user.firstName;
-  const studentClass = session.user.studentClass;
-  const staffRole = session.user.staffRole;
+
   const userType = session.user.isStudent
     ? `STUDENT | ${studentClass.toUpperCase()}`
     : staffRole.toUpperCase();
@@ -57,7 +67,9 @@ export default function Header({ isNavOpen, toggleNav }: HeaderProps) {
 
         <div>
           <p className="text-[10px] md:text-[12px] font-medium">Active Term</p>
-          <p className="text-[8px] md:text-[10px]">2024 / 2025 | 1ST TERM</p>
+          <p className="text-[8px] md:text-[10px]">
+            {activeTermAndSession.toUpperCase()}
+          </p>
         </div>
 
         <div className="flex gap-2">
