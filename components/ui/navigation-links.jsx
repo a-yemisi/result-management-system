@@ -21,18 +21,17 @@ function NavLink({ href, icon: Icon, label }) {
   const pathname = usePathname();
   const isActive = pathname === href;
 
-  const baseClass =
-    "flex gap-2 items-center w-full py-2 md:py-2.5 pl-2 md:pl-3 lg:pl-4 text-[11px] md:text-[12.5px] font-medium rounded-[8px]";
-  const hoverClass = "text-white bg-[#2E6B39]";
-  const defaultClass = "text-[#5C7060]  hover:bg-[#D6F5DC]";
-
   return (
     <Link
       href={href}
-      className={`${baseClass} ${isActive ? hoverClass : defaultClass}`}
+      className={`flex items-center gap-3 py-3 pl-4 rounded-lg text-sm md:text-base transition-all duration-200 ${
+        isActive
+          ? "bg-[#2E6B39] text-white shadow-md"
+          : "text-[#333] hover:bg-[#D6F5DC] hover:text-green-700"
+      }`}
     >
-      <Icon size={20} />
-      {label}
+      <Icon size={22} className="min-w-[24px]" />
+      <span>{label}</span>
     </Link>
   );
 }
@@ -133,12 +132,12 @@ export function UpdateStaffRolesNavLink() {
   );
 }
 
-export function CreateNewUser() {
+export function UserManagement() {
   return (
     <NavLink
-      href="/dashboard/create-user"
+      href="/dashboard/user-management"
       icon={MdOutlinePersonAddAlt}
-      label="Create New User"
+      label="User Management"
     />
   );
 }
@@ -151,9 +150,9 @@ export function SignOutButton() {
   return (
     <button
       onClick={handleSignOut}
-      className="flex gap-2 items-center w-full py-2 md:py-2.5 pl-2 md:pl-3 lg:pl-4 text-[11px] md:text-[12px] font-medium rounded-[8px] text-[#5C7060] hover:bg-[#D6F5DC]"
+      className="flex items-center gap-3 py-3 pl-4 text-sm rounded-lg text-[#5C7060] hover:bg-[#D6F5DC] transition-all duration-200"
     >
-      <MdExitToApp size={20} /> Sign Out
+      <MdExitToApp size={22} className="min-w-[24px]" /> Sign Out
     </button>
   );
 }

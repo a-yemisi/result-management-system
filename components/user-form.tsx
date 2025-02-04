@@ -3,6 +3,7 @@ import React from "react";
 interface UserFormProps {
   firstName: string;
   setFirstName: (value: string) => void;
+  isCreateMode: boolean;
   lastName: string;
   setLastName: (value: string) => void;
   username: string;
@@ -17,6 +18,7 @@ interface UserFormProps {
 const UserForm: React.FC<UserFormProps> = ({
   firstName,
   setFirstName,
+  isCreateMode,
   lastName,
   setLastName,
   username,
@@ -64,16 +66,18 @@ const UserForm: React.FC<UserFormProps> = ({
           required
         />
       </div>
-      <div>
-        <label className="block mb-1 font-medium">Password</label>
-        <input
-          type="password"
-          className="border rounded w-full p-2"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
-      </div>
+      {isCreateMode && (
+        <div>
+          <label className="block mb-1 font-medium">Password</label>
+          <input
+            type="password"
+            className="border rounded w-full p-2"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+        </div>
+      )}
       <div>
         <label className="block mb-1 font-medium">User Type</label>
         <select

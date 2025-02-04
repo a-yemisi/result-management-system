@@ -29,6 +29,8 @@ const StaffDetailsForm: React.FC<StaffDetailsFormProps> = ({
     onSubmit();
   };
 
+  console.log("Hire date");
+  console.log(staffDetails.hireDate);
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
@@ -36,7 +38,9 @@ const StaffDetailsForm: React.FC<StaffDetailsFormProps> = ({
         <input
           type="date"
           className="border rounded w-full p-2"
-          value={staffDetails.hireDate}
+          value={
+            staffDetails.hireDate ? staffDetails.hireDate.split("T")[0] : ""
+          }
           onChange={(e) =>
             setStaffDetails({ ...staffDetails, hireDate: e.target.value })
           }

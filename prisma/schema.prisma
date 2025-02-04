@@ -32,6 +32,8 @@ model StudentDetails {
   subclass_id           Int?
   parent_email          String?
   is_active             Boolean                 @default(true)
+  deactivated_at        DateTime?
+  graduated             Boolean                 @default(false)
   Users                 Users                   @relation(fields: [student_id], references: [user_id])
   Class                 Classes?                @relation(fields: [class_id], references: [class_id])
   SubClass              SubClasses?             @relation(fields: [subclass_id], references: [subclass_id])
@@ -43,6 +45,7 @@ model StudentDetails {
 model StaffDetails {
   staff_id              String                  @id @unique
   hire_date             DateTime?
+  deactivated_at        DateTime?
   is_active             Boolean                 @default(true)
   Users                 Users                   @relation(fields: [staff_id], references: [user_id])
   StaffUserRoles        StaffUserRoles[]

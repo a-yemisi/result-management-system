@@ -17,74 +17,73 @@ interface HeaderProps {
 
 export default function Header({ isNavOpen, toggleNav }: HeaderProps) {
   const { data: session, status } = useSession();
-  const [studentClass, setStudentClass] = useState("na");
-  const [staffRole, setStaffRole] = useState("na");
-  const [activeTermAndSession, setActiveTermAndSession] = useState("na");
+  const [studentClass, setStudentClass] = useState("NA");
+  const [staffRole, setStaffRole] = useState("NA");
+  const [activeTermAndSession, setActiveTermAndSession] = useState("NA");
 
   useEffect(() => {
-    if (session && session.user) {
-      setStudentClass(session.user.studentClass);
-      setStaffRole(session.user.staffRole);
+    if (session?.user) {
+      setStudentClass(session.user.studentClass || "NA");
+      setStaffRole(session.user.staffRole || "NA");
     }
   }, [session]);
 
-  // Check if session is loaded and if user data exists
-  if (status === "loading") {
-    return <p>Loading...</p>;
-  }
+  if (status === "loading") return <p className="text-center">Loading...</p>;
+  if (!session?.user) return <p className="text-center">User not logged in.</p>;
 
-  if (!session || !session.user) {
-    return <p>User not logged in.</p>;
-  }
-
-  // Now safely access session.user.firstName
-  const userName = session.user.firstName;
-
+  const userName = session.user.firstName || "User";
   const userType = session.user.isStudent
     ? `STUDENT | ${studentClass.toUpperCase()}`
     : staffRole.toUpperCase();
+
   return (
-    <div className="p-[15px] lg:px-[25px] flex gap-[15px] lg:gap-[25px] items-center text-[#2E3830] bg-white fixed w-full h-[60px] shadow-lg ">
+    <header className="p-4 lg:px-8 flex items-center text-[#2E3830] bg-white fixed w-full h-16 shadow-md">
+      {/* Mobile Menu Toggle */}
       <button onClick={toggleNav} className="text-[#2E3830] focus:outline-none">
-        {isNavOpen ? <CloseIcon size={20} /> : <MenuIcon size={20} />}
+        {isNavOpen ? <CloseIcon size={24} /> : <MenuIcon size={24} />}
       </button>
 
       <div className="flex items-center justify-between w-full">
-        <div className="flex gap-3">
+        {/* School Logo & Name */}
+        <div className="flex items-center gap-4">
           <div className="hidden md:block">
             <Image
               src="/dfc-logo.jpg"
-              width={30}
-              height={30}
-              alt="An img of the school logo"
-              className=""
+              width={35}
+              height={35}
+              alt="School Logo"
+              className="rounded-md shadow-sm"
             />
           </div>
-          <p className="hidden md:block md:text-[15px] font-medium">
+          <p className="hidden md:block text-base font-semibold tracking-wide">
             DIVINE FULFILMENT COLLEGE, OTA
           </p>
         </div>
 
-        <div>
-          <p className="text-[10px] md:text-[12px] font-medium">Active Term</p>
-          <p className="text-[8px] md:text-[10px]">
-            {activeTermAndSession.toUpperCase()}
+        {/* Active Term & Session */}
+        <div className="text-center">
+          <p className="text-sm font-medium text-gray-600">Active Term</p>
+          <p className="text-xs font-semibold text-[#2E6B39] uppercase">
+            {activeTermAndSession}
           </p>
         </div>
 
-        <div className="flex gap-2">
-          <div className="flex items-center">
-            <MdOutlinePerson2 size={30} />
-            <MdOutlineArrowDropDown size={15} />
+        {/* User Info Section */}
+        <div className="flex items-center gap-3">
+          <div className="flex items-center cursor-pointer group">
+            <MdOutlinePerson2 size={34} className="text-[#2E6B39]" />
+            <MdOutlineArrowDropDown size={20} className="text-gray-500" />
           </div>
-          <div>
-            <p className="text-[10px] md:text-[12px] font-medium">
+          <div className="text-right">
+            <p className="text-sm font-medium text-gray-800">
               {userName.toUpperCase()}
             </p>
-            <p className="text-[8px] md:text-[10px]">{userType}</p>
+            <p className="text-xs text-gray-500 font-medium uppercase">
+              {userType}
+            </p>
           </div>
         </div>
       </div>
-    </div>
+    </header>
   );
 }

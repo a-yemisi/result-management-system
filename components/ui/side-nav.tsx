@@ -12,32 +12,33 @@ import {
   ApproveResultNavLink,
   UpdateStaffRolesNavLink,
   SignOutButton,
-  CreateNewUser,
+  UserManagement,
 } from "@/components/ui/navigation-links";
 import { useSession } from "next-auth/react";
-import { useEffect, useState } from "react";
-import NotAllowed from "../not-allowed";
 import useStaffRoles from "@/hooks/use-staff-roles";
 
 export default function SideNav() {
   const { data: session, status } = useSession();
-
   const { staffRolesNames, loadingRoles, error } = useStaffRoles(session);
 
   if (status === "loading" || loadingRoles) {
-    return <p>Loading...</p>;
+    return <p className="text-center text-gray-500">Loading...</p>;
   }
 
   if (!session || !session.user) {
-    return <NotAllowed />;
+    return <></>;
   }
 
   if (error) {
-    return <p>{error}</p>;
+    return <p className="text-red-500 text-center">{error}</p>;
   }
 
   if (!staffRolesNames) {
-    return <p>Error: Unable to load roles data.</p>;
+    return (
+      <p className="text-red-500 text-center">
+        Error: Unable to load roles data.
+      </p>
+    );
   }
 
   const isStudent = session.user.isStudent;
@@ -50,12 +51,10 @@ export default function SideNav() {
 
   return (
     <div className="relative">
-      <div className="bg-white flex flex-col gap-2 w-[240px] fixed top-[60px]  left-0 h-full p-[15px] shadow-lg z-40">
-        <p className="text-[11px] md:text-[13px] font-semibold text-[#5C7060] mb-1 mt-2">
-          NAVIGATION
-        </p>
-        <div className="flex flex-col justify-between h-full">
-          <div className="flex flex-col gap-2">
+      <div className="bg-white flex flex-col gap-4 w-60 fixed top-16 left-0 h-full p-4 shadow-xl rounded-r-lg z-40 border-r border-gray-200">
+        <p className="text-sm font-semibold text-gray-600 mb-3">NAVIGATION</p>
+        <div className="flex flex-col justify-between">
+          <div className="flex flex-col gap-3">
             <HomeNavLink />
             {isStudent && <StudentSubjectNavLink />}
             {isStudent && <ViewResultNavLink />}
@@ -77,12 +76,11 @@ export default function SideNav() {
             {(isVicePrincipal || isPrincipal || isOwner || isAdministrator) && (
               <UpdateStaffRolesNavLink />
             )}
-
             {(isAdministrator || isOwner || isPrincipal || isVicePrincipal) && (
-              <CreateNewUser />
+              <UserManagement />
             )}
           </div>
-          <div className="mb-[60px]">
+          <div className="mt-auto z-40">
             <SignOutButton />
           </div>
         </div>

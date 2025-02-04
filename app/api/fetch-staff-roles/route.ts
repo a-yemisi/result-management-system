@@ -28,8 +28,10 @@ export async function GET(req: Request) {
       .map((staffRole) => staffRole.StaffRoles?.role_name) // Optional chaining for safety
       .filter((roleName) => roleName !== undefined); // Filter out undefined values
 
+    const roleIDs = staffRolesWithDetails.map((role) => role.role_id);
+
     // Return role names as a response
-    return NextResponse.json({ roleNames });
+    return NextResponse.json({ roleNames, roleIDs });
   } catch (error) {
     console.error("Error fetching staff roles:", error);
     return NextResponse.json(

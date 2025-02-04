@@ -1,11 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { usePathname } from "next/navigation"; // Import this hook
 import SideNav from "@/components/ui/side-nav";
 import Header from "@/components/ui/header";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const [isNavOpen, setIsNavOpen] = useState(false);
+  const pathname = usePathname(); // Get the current URL path
 
   const updateNavState = () => {
     const isLargeScreen = window.matchMedia("(min-width: 768px)").matches; // md breakpoint
@@ -13,10 +15,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   };
 
   useEffect(() => {
-    // Check the screen size on initial render
-    updateNavState();
+    updateNavState(); // Set initial state based on screen size
 
-    // Listen for screen size changes
     const mediaQuery = window.matchMedia("(min-width: 768px)");
     mediaQuery.addEventListener("change", updateNavState);
 
@@ -24,6 +24,11 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       mediaQuery.removeEventListener("change", updateNavState);
     };
   }, []);
+
+  // Reset nav when the pathname changes (new page loaded)
+  useEffect(() => {
+    updateNavState(); // Reset to default behavior
+  }, [pathname]);
 
   const toggleNav = () => setIsNavOpen(!isNavOpen);
 
