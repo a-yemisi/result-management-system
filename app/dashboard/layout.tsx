@@ -11,8 +11,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const [isLargeScreen, setLargeScreen] = useState(false); // md breakpoint
 
   const updateNavState = () => {
-    setLargeScreen(window.matchMedia("(min-width: 768px)").matches);
-    setIsNavOpen(isLargeScreen);
+    const largeScreen = window.matchMedia("(min-width: 768px)").matches;
+    setLargeScreen(largeScreen);
+    setIsNavOpen(largeScreen); // Open the nav if large screen
   };
 
   useEffect(() => {
@@ -49,7 +50,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 : "fixed inset-0 bg-black bg-opacity-50 backdrop-blur-lg z-40"
             }`}
             onClick={() => {
-              console.log("Closeing nav barr...");
+              console.log("Closing nav...");
               setIsNavOpen(false);
             }}
           >
