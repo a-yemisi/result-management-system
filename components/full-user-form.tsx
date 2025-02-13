@@ -31,7 +31,7 @@ export default function FullUserForm({
   const [isStudent, setIsStudent] = useState(selectedUser?.is_student ?? true);
   const [studentDetails, setStudentDetails] = useState({
     classId: selectedUser?.StudentDetails?.class_id || 0,
-    subClassId: selectedUser?.StudentDetails?.student_id || 0,
+    subClassId: selectedUser?.StudentDetails?.subclass_id || 0,
     parentEmail: selectedUser?.StudentDetails?.parent_email || "",
   });
   const [staffDetails, setStaffDetails] = useState({
@@ -101,7 +101,7 @@ export default function FullUserForm({
       const studentData = {
         parent_email: studentDetails.parentEmail,
         class_id: studentDetails.classId,
-        subclass_id: studentDetails.subClassId || null,
+        subclass_id: Number(studentDetails.subClassId) || null,
       };
       finalBody = { ...userData, ...studentData };
     } else {
@@ -113,14 +113,29 @@ export default function FullUserForm({
     }
 
     try {
-      const response = await fetch("/api/create-user", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(finalBody),
-      });
-      const data = await response.json();
-      if (!response.ok) {
-        alert(`Failed to create new user: ${data.error}`);
+      if (isCreateMode) {
+        const response = await fetch("/api/create-user", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(finalBody),
+        });
+        const data = await response.json();
+        if (!response.ok) {
+          alert(`Failed to create new user: ${data.error}`);
+        }
+      } else {
+        const userIDOnly = { user_id: selectedUser?.user_id };
+        finalBody = { ...userIDOnly, ...finalBody };
+        console.log(finalBody);
+        const response = await fetch("/api/update-user", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(finalBody),
+        });
+        const data = await response.json();
+        if (!response.ok) {
+          alert(`Failed to update user: ${data.error}`);
+        }
       }
       onClose();
     } catch (error) {

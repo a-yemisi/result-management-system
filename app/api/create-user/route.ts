@@ -63,7 +63,7 @@ export async function POST(req: Request) {
 
         await prisma.studentDetails.create({
           data: {
-            student_id: user.user_id, // Use user_id as the foreign key
+            student_id: user.user_id,
             class_id,
             subclass_id,
             parent_email,

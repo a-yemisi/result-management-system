@@ -38,7 +38,7 @@ export default function DeactivateUserModal({
     }
   };
   return (
-    <div className="p-6 bg-white rounded-lg shadow-md w-[350px]">
+    <div className="p-6 bg-white rounded-lg shadow-md min-w-[270px]">
       <h2 className="text-lg font-semibold text-gray-800 mb-3">
         Deactivate User
       </h2>

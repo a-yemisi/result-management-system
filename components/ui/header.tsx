@@ -37,7 +37,7 @@ export default function Header({ isNavOpen, toggleNav }: HeaderProps) {
     : staffRole.toUpperCase();
 
   return (
-    <header className="p-4 lg:px-8 flex items-center text-[#2E3830] bg-white fixed w-full h-16 shadow-md">
+    <header className="p-4 lg:px-8 flex md:gap-3 items-center text-[#2E3830] bg-white fixed w-full h-16 shadow-md">
       {/* Mobile Menu Toggle */}
       <button onClick={toggleNav} className="text-[#2E3830] focus:outline-none">
         {isNavOpen ? <CloseIcon size={24} /> : <MenuIcon size={24} />}

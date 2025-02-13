@@ -150,7 +150,7 @@ export function SignOutButton() {
   return (
     <button
       onClick={handleSignOut}
-      className="flex items-center gap-3 py-3 pl-4 text-sm rounded-lg text-[#5C7060] hover:bg-[#D6F5DC] transition-all duration-200"
+      className="flex items-center gap-3 py-3 pl-4 w-full rounded-lg text-sm md:text-base transition-all duration-200 text-[#333] hover:bg-[#D6F5DC] hover:text-green-700"
     >
       <MdExitToApp size={22} className="min-w-[24px]" /> Sign Out
     </button>
