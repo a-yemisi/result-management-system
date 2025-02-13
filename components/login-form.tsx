@@ -13,10 +13,13 @@ export default function LoginForm({
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const [loading, setLoading] = useState(false); // State to track loading
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true); // Set loading to true before starting the login process
+
     const result = await signIn("credentials", {
       username,
       password,
@@ -32,8 +35,10 @@ export default function LoginForm({
     }
 
     if (result?.ok) {
-      router.push(result.url || "/dashboard/hoome");
+      router.push(result.url || "/dashboard/home");
     }
+
+    setLoading(false); // Set loading to false after the process is done
   };
 
   return (
@@ -103,6 +108,14 @@ export default function LoginForm({
       >
         <p>Forgot password?</p>
       </div>
+
+      {/* Loading Spinner or Text */}
+      {loading && (
+        <div className="flex justify-center items-center mt-4">
+          <div className="spinner-border animate-spin inline-block w-8 h-8 border-[4px] border-solid border-[#2E6B39] border-t-transparent rounded-full" />
+          <p className="ml-2 text-[#2E6B39]">Loading...</p>
+        </div>
+      )}
 
       <div className="flex flex-col items-end">
         <button
