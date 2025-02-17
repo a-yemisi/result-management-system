@@ -3,8 +3,6 @@ import { NextResponse } from "next/server";
 
 export async function GET(req: Request) {
   try {
-    console.log("Fetching counts...");
-
     const studentUsersCount = await prisma.studentDetails.count({
       where: { is_active: true },
     });

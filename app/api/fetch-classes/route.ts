@@ -3,8 +3,6 @@ import { NextResponse } from "next/server";
 
 export async function GET(req: Request) {
   try {
-    console.log("Fetching classes...");
-
     // Fetch all classes from the database
     const classes = await prisma.classes.findMany();
 

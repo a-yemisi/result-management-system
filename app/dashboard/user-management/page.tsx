@@ -4,7 +4,8 @@ import { useSession } from "next-auth/react";
 import { useState, useEffect, useCallback } from "react";
 import useStaffRoles from "@/hooks/use-staff-roles";
 import NotAllowed from "@/components/not-allowed";
-import type { Users, Prisma } from "@prisma/client";
+import type { Users, Prisma, Classes } from "@prisma/client";
+import { fetchClasses } from "@/hooks/get-all-classes";
 import {
   MdOutlineDiversity3,
   MdOutlineSchool,
@@ -24,6 +25,7 @@ export default function UserManagementPage() {
     studentsCount: 0,
     staffsCount: 0,
   });
+
   const [users, setUsers] = useState<
     Prisma.UsersGetPayload<{
       include: {
@@ -45,13 +47,39 @@ export default function UserManagementPage() {
       };
     }> | null>(null);
   const [isCreateMode, setIsCreateMode] = useState(true);
+  const [toFilterIsStudent, setToFilterIsStudent] = useState<boolean>();
+  const [toFilterClassID, setToFilterClassID] = useState<number>();
+  // const [selectedClassID, setSelectedClassID] = useState<number>();
+  const [classes, setClasses] = useState<Classes[]>([]);
+
   const rowsPerPage = 10;
+
+  useEffect(() => {
+    const fetchClasses = async () => {
+      try {
+        const response = await fetch("/api/fetch-classes");
+        const data = await response.json();
+        setClasses(data.classes);
+      } catch (error) {
+        console.error(`Error fetching classes: ${error}`);
+      }
+    };
+    fetchClasses();
+  }, [fetchClasses]);
 
   const fetchData = useCallback(async () => {
     try {
+      const fetchUsersParameters = {
+        is_student: toFilterIsStudent,
+        class_id: toFilterClassID,
+      };
       const [countsResponse, usersResponse] = await Promise.all([
         fetch("/api/fetch-counts"),
-        fetch("/api/fetch-users"),
+        fetch("/api/fetch-users", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(fetchUsersParameters),
+        }),
       ]);
 
       if (!countsResponse.ok || !usersResponse.ok)
@@ -65,7 +93,7 @@ export default function UserManagementPage() {
     } catch (error) {
       console.error("Error fetching data:", error);
     }
-  }, []);
+  }, [toFilterIsStudent, toFilterClassID]);
 
   useEffect(() => {
     fetchData();
@@ -191,6 +219,72 @@ export default function UserManagementPage() {
             </div>
           ))}
         </div>
+        <div className="bg-white p-5 rounded-lg shadow-md border border-gray-200">
+          <h2 className="text-lg font-semibold text-gray-800 mb-4">
+            Filter Users
+          </h2>
+
+          <div className="grid md:grid-cols-2 gap-4">
+            {/* User Type Filter */}
+            <div className="flex flex-col">
+              <label htmlFor="user-type" className="text-gray-600 text-sm mb-1">
+                User Type
+              </label>
+              <select
+                id="user-type"
+                className="border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-green-500 focus:outline-none"
+                value={
+                  toFilterIsStudent == undefined
+                    ? ""
+                    : toFilterIsStudent
+                    ? "student"
+                    : "staff"
+                }
+                onChange={(e) => {
+                  setToFilterIsStudent(e.target.value === "student");
+                  fetchData();
+                }}
+              >
+                <option value="" disabled>
+                  -- Select User Type --
+                </option>
+                <option value="staff">Staff</option>
+                <option value="student">Student</option>
+              </select>
+            </div>
+
+            {/* Student Class Filter (Conditional) */}
+            {toFilterIsStudent && (
+              <div className="flex flex-col">
+                <label
+                  htmlFor="student-class"
+                  className="text-gray-600 text-sm mb-1"
+                >
+                  By Student Class
+                </label>
+                <select
+                  id="student-class"
+                  className="border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-green-500 focus:outline-none"
+                  value={toFilterClassID == undefined ? "" : toFilterClassID}
+                  onChange={(e) => {
+                    setToFilterClassID(Number(e.target.value));
+                    fetchData();
+                  }}
+                >
+                  <option value="" disabled>
+                    -- Select Class --
+                  </option>
+                  {classes.map((classItem) => (
+                    <option key={classItem.class_id} value={classItem.class_id}>
+                      {classItem.class_name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+          </div>
+        </div>
+
         <div className="overflow-x-auto bg-white rounded-lg shadow-md">
           <table className="w-full text-left">
             <thead className="text-white bg-green-700">
