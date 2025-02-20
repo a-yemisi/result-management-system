@@ -96,6 +96,7 @@ const StudentDetailsForm: React.FC<StudentDetailsFormProps> = ({
               classId: e.target.value ? parseInt(e.target.value) : null,
             })
           }
+          required
         >
           <option value={0} disabled>
             -- Select your class --
@@ -121,6 +122,7 @@ const StudentDetailsForm: React.FC<StudentDetailsFormProps> = ({
               subClassId: e.target.value ? parseInt(e.target.value) : null,
             })
           }
+          required
         >
           <option value={0} disabled>
             -- Select your sub class --

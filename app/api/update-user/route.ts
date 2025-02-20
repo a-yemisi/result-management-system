@@ -3,10 +3,15 @@ import prisma from "@/lib/prisma";
 import { z } from "zod";
 
 const userSchema = z.object({
-  user_id: z.string().min(1, "User ID is required"),
-  username: z.string().min(1, "Username is required"),
-  first_name: z.string().min(1, "First name is required"),
-  last_name: z.string().min(1, "Last name is required"),
+  user_id: z.string().min(1, " User ID is required"),
+  username: z
+    .string()
+    .min(3, " Username must be at least 3 characters long")
+    .refine((val) => val.includes("."), {
+      message: "Username must include a '.' (dot)",
+    }),
+  first_name: z.string().min(1, " First name is required"),
+  last_name: z.string().min(1, " Last name is required"),
   is_student: z.boolean(),
   class_id: z.number().optional(),
   subclass_id: z.number().optional(),
@@ -76,7 +81,12 @@ export async function POST(req: Request) {
       console.log("Validation failed");
       console.error(validation.error.errors);
       return NextResponse.json(
-        { error: validation.error.errors },
+        {
+          error: "Validation failed",
+          details: Object.values(validation.error.flatten().fieldErrors)
+            .flat()
+            .filter(Boolean),
+        },
         { status: 400 }
       );
     }

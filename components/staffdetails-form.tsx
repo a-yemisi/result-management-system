@@ -19,20 +19,20 @@ const StaffDetailsForm: React.FC<StaffDetailsFormProps> = ({
   onBack,
 }) => {
   const [message, setMessage] = useState("");
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (staffDetails.roles.length === 0) {
-      setMessage("Select teacher's roles");
+      setMessage("Select at least one role.");
       return;
     }
     setMessage("");
     onSubmit();
   };
 
-  console.log("Hire date");
-  console.log(staffDetails.hireDate);
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
+      {/* Hire Date Input */}
       <div>
         <label className="block mb-1 font-medium">Hire Date</label>
         <input
@@ -47,30 +47,37 @@ const StaffDetailsForm: React.FC<StaffDetailsFormProps> = ({
           required
         />
       </div>
+
+      {/* Roles Checkbox List */}
       <div>
         <label className="block mb-1 font-medium">Roles</label>
         {availableRoles.map((role) => (
           <div key={role.role_id} className="flex items-center space-x-2">
             <input
               type="checkbox"
-              id={`${role.role_id}`}
+              id={`role-${role.role_id}`}
               checked={staffDetails.roles.includes(role.role_id)}
               onChange={(e) => {
                 const newRoles = e.target.checked
                   ? [...staffDetails.roles, role.role_id]
                   : staffDetails.roles.filter((r) => r !== role.role_id);
+
                 setStaffDetails({ ...staffDetails, roles: newRoles });
-                setStaffDetails({ ...staffDetails, roles: newRoles });
+
                 if (newRoles.length > 0) {
-                  setMessage("");
+                  setMessage(""); // Remove error if at least one checkbox is selected
                 }
               }}
             />
-            <label htmlFor={`${role.role_id}`}>{role.role_name}</label>
+            <label htmlFor={`role-${role.role_id}`}>{role.role_name}</label>
           </div>
         ))}
       </div>
+
+      {/* Error Message */}
       {message && <p className="text-red-500 text-sm mt-2">{message}</p>}
+
+      {/* Navigation Buttons */}
       <div className="flex justify-between">
         <button
           type="button"

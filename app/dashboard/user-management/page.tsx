@@ -49,6 +49,8 @@ export default function UserManagementPage() {
   const [isCreateMode, setIsCreateMode] = useState(true);
   const [toFilterIsStudent, setToFilterIsStudent] = useState<boolean>();
   const [toFilterClassID, setToFilterClassID] = useState<number>();
+  const [toShowAllUserType, setToShowAllUserType] = useState<boolean>();
+  const [toShowAllStudents, setToShowAllStudents] = useState<boolean>();
   // const [selectedClassID, setSelectedClassID] = useState<number>();
   const [classes, setClasses] = useState<Classes[]>([]);
 
@@ -69,6 +71,8 @@ export default function UserManagementPage() {
 
   const fetchData = useCallback(async () => {
     try {
+      if (toShowAllUserType) setToFilterIsStudent(undefined);
+      if (toShowAllStudents) setToFilterClassID(undefined);
       const fetchUsersParameters = {
         is_student: toFilterIsStudent,
         class_id: toFilterClassID,
@@ -93,7 +97,12 @@ export default function UserManagementPage() {
     } catch (error) {
       console.error("Error fetching data:", error);
     }
-  }, [toFilterIsStudent, toFilterClassID]);
+  }, [
+    toFilterIsStudent,
+    toFilterClassID,
+    toShowAllStudents,
+    toShowAllUserType,
+  ]);
 
   useEffect(() => {
     fetchData();
@@ -181,6 +190,7 @@ export default function UserManagementPage() {
           </div>
         )}
 
+        {/* Count Cards */}
         <div className="grid gap-6 md:gap-8 lg:gap-10 grid-cols-1 md:grid-cols-3">
           {[
             {
@@ -219,6 +229,8 @@ export default function UserManagementPage() {
             </div>
           ))}
         </div>
+
+        {/* Filter Users */}
         <div className="bg-white p-5 rounded-lg shadow-md border border-gray-200">
           <h2 className="text-lg font-semibold text-gray-800 mb-4">
             Filter Users
@@ -234,15 +246,25 @@ export default function UserManagementPage() {
                 id="user-type"
                 className="border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-green-500 focus:outline-none"
                 value={
-                  toFilterIsStudent == undefined
+                  toShowAllUserType
+                    ? "all"
+                    : toFilterIsStudent == undefined
                     ? ""
                     : toFilterIsStudent
                     ? "student"
                     : "staff"
                 }
                 onChange={(e) => {
-                  setToFilterIsStudent(e.target.value === "student");
-                  fetchData();
+                  const value = e.target.value;
+
+                  setToShowAllUserType(value === "all");
+                  setToFilterIsStudent(
+                    value === "student"
+                      ? true
+                      : value === "staff"
+                      ? false
+                      : undefined
+                  );
                 }}
               >
                 <option value="" disabled>
@@ -250,6 +272,7 @@ export default function UserManagementPage() {
                 </option>
                 <option value="staff">Staff</option>
                 <option value="student">Student</option>
+                <option value="all">All</option>
               </select>
             </div>
 
@@ -265,10 +288,23 @@ export default function UserManagementPage() {
                 <select
                   id="student-class"
                   className="border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-green-500 focus:outline-none"
-                  value={toFilterClassID == undefined ? "" : toFilterClassID}
+                  value={
+                    toShowAllStudents
+                      ? "all"
+                      : toFilterClassID == undefined
+                      ? ""
+                      : toFilterClassID
+                  }
                   onChange={(e) => {
-                    setToFilterClassID(Number(e.target.value));
-                    fetchData();
+                    const value = e.target.value;
+
+                    if (value === "all") {
+                      setToShowAllStudents(true);
+                      setToFilterClassID(undefined);
+                    } else {
+                      setToShowAllStudents(false);
+                      setToFilterClassID(Number(value));
+                    }
                   }}
                 >
                   <option value="" disabled>
@@ -279,12 +315,14 @@ export default function UserManagementPage() {
                       {classItem.class_name}
                     </option>
                   ))}
+                  <option value="all">All</option>
                 </select>
               </div>
             )}
           </div>
         </div>
 
+        {/* Table */}
         <div className="overflow-x-auto bg-white rounded-lg shadow-md">
           <table className="w-full text-left">
             <thead className="text-white bg-green-700">

@@ -64,6 +64,8 @@ const UserForm: React.FC<UserFormProps> = ({
           value={username}
           onChange={(e) => setUsername(e.target.value)}
           required
+          pattern="[^@]+\.[^@]+"
+          title="Must contain a dot (.)"
         />
       </div>
       {isCreateMode && (
@@ -74,6 +76,9 @@ const UserForm: React.FC<UserFormProps> = ({
             className="border rounded w-full p-2"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            minLength={6}
+            maxLength={20}
+            title="Must be between 6 and 20 characters long"
             required
           />
         </div>

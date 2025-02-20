@@ -101,7 +101,7 @@ export default function FullUserForm({
       const studentData = {
         parent_email: studentDetails.parentEmail,
         class_id: studentDetails.classId,
-        subclass_id: Number(studentDetails.subClassId) || null,
+        subclass_id: Number(studentDetails.subClassId) || undefined,
       };
       finalBody = { ...userData, ...studentData };
     } else {
@@ -121,6 +121,8 @@ export default function FullUserForm({
         });
         const data = await response.json();
         if (!response.ok) {
+          console.log(`Failed to create new user: ${data.error}`);
+          console.log(data.error);
           alert(`Failed to create new user: ${data.error}`);
         }
       } else {

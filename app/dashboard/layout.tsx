@@ -46,7 +46,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           <div
             className={`${
               isLargeScreen
-                ? ""
+                ? "fixed"
                 : "fixed inset-0 bg-black bg-opacity-50 backdrop-blur-lg z-40"
             }`}
             onClick={() => {
@@ -59,6 +59,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             </div>
           </div>
         )}
+        <div></div>
         <div className="flex-1 min-h-screen ">
           <div className="h-[60px]"></div>
           <main className="p-3 ">{children}</main>
