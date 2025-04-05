@@ -194,17 +194,87 @@ async function retrieveMultipleData() {
   }
 }
 
+async function seedSubjectTypes() {
+  try {
+    await prisma.subjectTypes.createMany({
+      data: [{ type_name: "Compulsory" }, { type_name: "Optional" }],
+    });
+  } catch (error) {
+    console.error(`Error seeding subject types... ${error}`);
+  }
+}
+
+async function seedSubjects(
+  subjectTeacherUsername: string,
+  subjectTypeName: string,
+  subjectClassName: string,
+  subjectName: string,
+  studentSubClass?: string
+) {
+  try {
+    // Get subject teacher
+    const aCurrentStaff = await prisma.users.findUnique({
+      select: { user_id: true },
+      where: { username: subjectTeacherUsername },
+    });
+
+    // Get class subject belongs to
+    const aCurrentClass = await prisma.classes.findFirst({
+      select: { class_id: true },
+      where: { class_name: subjectClassName },
+    });
+
+    const subjectType = await prisma.subjectTypes.findFirst({
+      select: { type_id: true },
+      where: { type_name: subjectTypeName },
+    });
+
+    let aCurrentSubClass;
+
+    if (studentSubClass) {
+      aCurrentSubClass = await prisma.subClasses.findFirst({
+        select: { subclass_id: true },
+        where: {
+          subclass_name: studentSubClass,
+          class_id: aCurrentClass.class_id,
+        },
+      });
+    }
+
+    // Seed Subject
+    await prisma.subjects.create({
+      data: {
+        subject_name: subjectName,
+        class_id: aCurrentClass.class_id,
+        subject_type: subjectType.type_id,
+        subject_teacher: aCurrentStaff.user_id,
+        subclass_id: aCurrentSubClass ? aCurrentSubClass.subclass_id : null,
+      },
+    });
+  } catch (error) {
+    console.error(`Error seeding student subjects... ${error}`);
+  }
+}
+
 async function seed() {
   try {
     // await seedClasses();
     // await seedSubClasses();
     // await seedStaffRoles();
     // await seedAdminStudentUser();
-    await seedAdminStaffUser();
+    // await seedAdminStaffUser();
     // await retrieveMultipleData();
+    // await seedSubjectTypes();
+    // await seedSubjects(
+    //   "admin.staff",
+    //   "Optional",
+    //   "SSS One",
+    //   "Science Administration",
+    //   "Science"
     console.log("All data seeded successfully!");
   } catch (error) {
-    console.error(`Error during seeding: ${error}`);
+    console.error(`Error during seeding`);
+    console.error(error);
   } finally {
     await prisma.$disconnect;
   }

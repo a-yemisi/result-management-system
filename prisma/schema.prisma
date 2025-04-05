@@ -51,12 +51,13 @@ model StaffDetails {
   StaffUserRoles        StaffUserRoles[]
   SubClasses            SubClasses[]
   Classes               Classes[]
+  Subjects              Subjects[]
   StudentAverageResults StudentAverageResults[]
 }
 
 model Classes {
   class_id              Int                     @id @default(autoincrement())
-  class_name            String
+  class_name            String                  
   class_teacher         String?
   teacher               StaffDetails?           @relation(fields: [class_teacher], references: [staff_id])
   SubClasses            SubClasses[]
@@ -147,12 +148,14 @@ model SubjectTypes {
 model Subjects {
   subject_id      Int               @id @default(autoincrement())
   subject_name    String
-  class_id        Int?
+  class_id        Int
   subclass_id     Int?
   subject_type    Int?
-  Classes         Classes?          @relation(fields: [class_id], references: [class_id])
+  subject_teacher String?
+  Classes         Classes           @relation(fields: [class_id], references: [class_id])
   SubClasses      SubClasses?       @relation(fields: [subclass_id], references: [subclass_id])
   SubjectTypes    SubjectTypes?     @relation(fields: [subject_type], references: [type_id])
+  teacher         StaffDetails?      @relation(fields: [subject_teacher], references: [staff_id])
   StudentSubjects StudentSubjects[]
 }
 

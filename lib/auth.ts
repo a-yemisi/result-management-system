@@ -87,6 +87,7 @@ export const authOptions: NextAuthOptions = {
             id: user.user_id,
             name: user.username,
             firstName: user.first_name,
+            lastName: user.last_name,
             isStudent: user.is_student,
             studentClass: studentCurrentClass?.class_name,
             staffRole: importantStaffRole?.role_name,
@@ -109,6 +110,7 @@ export const authOptions: NextAuthOptions = {
       if (user) {
         token.id = user.id;
         token.firstName = user.firstName;
+        token.lastName = user.lastName;
         token.isStudent = user.isStudent;
         token.studentClass = user.studentClass;
         token.staffRole = user.staffRole;
@@ -119,6 +121,7 @@ export const authOptions: NextAuthOptions = {
       if (token) {
         session.user.id = token.id;
         session.user.firstName = token.firstName;
+        session.user.lastName = token.lastName;
         session.user.isStudent = token.isStudent;
         session.user.studentClass = token.studentClass;
         session.user.staffRole = token.staffRole;
