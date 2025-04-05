@@ -1,12 +1,35 @@
+import { useEffect, useState } from "react";
+
 interface StudentInformationProps {
   studentFirstName: string;
   studentLastName: string;
+  studentUserID: string;
 }
 
 export default function StudentInformation({
   studentFirstName,
   studentLastName,
+  studentUserID,
 }: StudentInformationProps) {
+  const [className, setClassName] = useState("");
+  const [subClassName, setSubClassName] = useState("");
+
+  useEffect(() => {
+    const fetchStaffSubjects = async () => {
+      const res = await fetch(
+        `/api/fetch-student-details?userId=${studentUserID}`
+      );
+      if (!res.ok) throw new Error("Failed to fetch roles");
+      const result = await res.json();
+      setClassName(result.classDetails.Class.class_name);
+      result.classDetails.SubClass
+        ? setSubClassName(result.classDetails.SubClass.subclass_name)
+        : setSubClassName("");
+    };
+
+    fetchStaffSubjects();
+  }, []);
+
   return (
     <div className="bg-white p-5 w-full rounded-xl shadow-lg border border-gray-200">
       <h2 className="text-lg font-semibold text-gray-900 mb-4">
@@ -27,8 +50,16 @@ export default function StudentInformation({
             {studentFirstName} {studentLastName}
           </p>
           <div className="flex items-center gap-3 text-gray-600">
-            <p className="px-3 py-1 bg-gray-100 rounded-lg text-sm">SS2</p>
-            <p className="px-3 py-1 bg-gray-100 rounded-lg text-sm">Science</p>
+            <p className="px-3 py-1 bg-gray-100 rounded-lg text-sm">
+              {className}
+            </p>
+            {subClassName == "" ? (
+              ""
+            ) : (
+              <p className="px-3 py-1 bg-gray-100 rounded-lg text-sm">
+                {subClassName}
+              </p>
+            )}
           </div>
           {/* <p className="text-sm text-gray-500 mt-1">LIN-202545553333</p> */}
         </div>

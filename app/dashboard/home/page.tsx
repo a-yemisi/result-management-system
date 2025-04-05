@@ -33,6 +33,7 @@ export default function HomePage() {
   const isStudent = session.user?.isStudent;
   const userFirstName = session.user?.firstName;
   const userLastName = session.user?.lastName;
+  const userID = session.user?.id;
   const isTeacher = staffRolesNames.includes("Teacher");
   const isClassTeacher = staffRolesNames.includes("Class Teacher");
   const isPrincipal = staffRolesNames.includes("Principal");
@@ -48,6 +49,7 @@ export default function HomePage() {
       <div className="grid lg:grid-cols-[2fr_1.5fr] gap-5 lg:gap-10">
         {isStudent && (
           <StudentInformation
+            studentUserID={userID}
             studentFirstName={userFirstName}
             studentLastName={userLastName}
           />
@@ -57,6 +59,7 @@ export default function HomePage() {
             isClassTeacher={isClassTeacher}
             staffFirstName={userFirstName}
             staffLastName={userLastName}
+            staffUserID={userID}
           />
         )}
         <Tabs />

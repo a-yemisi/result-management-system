@@ -85,7 +85,6 @@ export const authOptions: NextAuthOptions = {
           // Return user info if authentication is successful
           return {
             id: user.user_id,
-            name: user.username,
             firstName: user.first_name,
             lastName: user.last_name,
             isStudent: user.is_student,
